@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>My Octopress Blog</title>
-  <meta name="author" content="Your Name">
+  <title>Automatization</title>
+  <meta name="author" content="Mike Dolinin">
 
   
-  <meta name="description" content=" Blog Archives Recent Posts ">
+  <meta name="description" content="Thucydides is very cool test automation framework, with good built-in support of Selenium/WebDriver, understandable java API, simple architecture. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -21,7 +21,7 @@
   <link rel="canonical" href="http://mdolinin.github.io">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="My Octopress Blog" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Automatization" type="application/atom+xml">
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
@@ -36,9 +36,9 @@
 
 <body   >
   <header role="banner"><hgroup>
-  <h1><a href="/">My Octopress Blog</a></h1>
+  <h1><a href="/">Automatization</a></h1>
   
-    <h2>A blogging framework for hackers.</h2>
+    <h2>Build the right tools right</h2>
   
 </hgroup>
 
@@ -66,6 +66,195 @@
       <div class="blog-index">
   
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel/">Thucydides+JBehave+Maven Run Tests in Parallel</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-17T05:31:04+02:00" pubdate data-updated="true">Jan 17<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Thucydides is very cool test automation framework, with good built-in support of Selenium/WebDriver, understandable java API, simple architecture. This project also has integration with common BDD frameworks as JBehave and EasyB. Integration with JBehave is done by thucydides-jbehave project <a href="https://github.com/thucydides-webtests/thucydides-jbehave">src</a>.</p>
+
+<p>JBehave allow you to write, store and run you tests in plain text files with <em>.story</em> extension.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">Scenario:</span><span class="nf"> trader is not alerted below threshold</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">Given </span><span class="nf">a stock of symbol STK</span><span class="s">1</span><span class="nf"> and a threshold of </span><span class="s">10.0</span><span class="nf"></span>
+</span><span class='line'><span class="k">When </span><span class="nf">the stock is traded at </span><span class="s">5.0</span><span class="nf"></span>
+</span><span class='line'><span class="k">Then </span><span class="nf">the alert status should be OFF</span>
+</span><span class='line'><span class="nf"> </span>
+</span><span class='line'><span class="k">Scenario:</span><span class="nf"> trader is alerted above threshold</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">Given </span><span class="nf">a stock of symbol STK</span><span class="s">1</span><span class="nf"> and a threshold of </span><span class="s">10.0</span><span class="nf"></span>
+</span><span class='line'><span class="k">When </span><span class="nf">the stock is traded at </span><span class="s">11.0</span><span class="nf"></span>
+</span><span class='line'><span class="k">Then </span><span class="nf">the alert status should be ON</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each story file is same as one test suite. That&rsquo;s why it should be atomic and without dependecies from other tests.</p>
+
+<p>The main goal of testing is to provide feedback to developers team as fast as possible. The most powerfull solution to reduce time spent for tests is run them in parallel processes. Now if you use Thucydides and Jbehave frameworks together out of the box, you couldn&rsquo;t run tests in parallel mode.
+But exists severall solutions for this issue.</p>
+
+<p><strong>First</strong> is automatically divide all stories on batches and than run them by some <em>build server</em>. <a href="http://wakaleo.com/index.php/blog/running-parallel-acceptance-tests-using-jbehave-thucydides-and-bamboo">Here</a> is good article writen by Simeon Ross. Witch present how to use this approach by using <a href="https://www.atlassian.com/software/bamboo">Bamboo</a>.</p>
+
+<p><strong>Second</strong> is to use <a href="http://maven.apache.org/surefire/maven-failsafe-plugin/examples/fork-options-and-parallel-execution.html">Maven Failsafe plugin parallel test execution ability</a>. Maven failsafe plugin has ability to run tests using <em>forks</em> by setting the parameter <em>forkCount</em> to a value higher than 1. The parameter <em>forkCount</em> defines the maximum number of JVM processes that Failsafe will spawn concurrently to execute the tests. Below you can find example of this approach.</p>
+
+<p>First of all you should create JUnitStory test for each JBehave story. For example you have <em>use_calendar.story</em> file inside your <em>src/test/resources/stories</em> folder. That&rsquo;s mean you should create UseCalendar class in your <em>src/test/java</em> folder. And extend it from ThucydidesJUnitStory class.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">mdolinin</span><span class="o">.</span><span class="na">acceptancetest</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.jbehave.ThucydidesJUnitStory</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UseCalendar</span> <span class="kd">extends</span> <span class="n">ThucydidesJUnitStory</span> <span class="o">{}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then made changes in configuration of your pom.xml. We should define where to find our JUnitStory classes and how many forks to use. For example we want to run all our stories in parallel mode.</p>
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>         <span class="nt">&lt;plugin&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;artifactId&gt;</span>maven-failsafe-plugin<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;version&gt;</span>2.16<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;systemPropertyVariables&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;webdriver.driver&gt;</span>${webdriver.driver}<span class="nt">&lt;/webdriver.driver&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/systemPropertyVariables&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;includes&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;include&gt;</span>**/acceptancetest/*.java<span class="nt">&lt;/include&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/includes&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;forkMode&gt;</span>perthread<span class="nt">&lt;/forkMode&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;threadCount&gt;</span>4<span class="nt">&lt;/threadCount&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;executions&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;goal&gt;</span>integration-test<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;goal&gt;</span>verify<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/executions&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/plugin&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now if you run your tests using maven than every story will run in one of four forks.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mvn integration-test
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But it is boring to create new boilerplate class for each story file. That&rsquo;s why I created <em>maven-thucydides-jbehave-plugin</em> <a href="https://github.com/mdolinin/maven-thucydides-jbehave-plugin">src</a> for this job. To use it add to your pom.xml build section with goal <em>generate-sources</em> and define <em>project.junit.stories.package</em>(where to put generated stubs) in properties section. See example below:</p>
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;properties&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;project.build.sourceEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.build.sourceEncoding&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;project.reporting.outputEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.reporting.outputEncoding&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;webdriver.driver&gt;</span>firefox<span class="nt">&lt;/webdriver.driver&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;project.junit.stories.package&gt;</span>com.mdolinin.acceptancetest<span class="nt">&lt;/project.junit.stories.package&gt;</span>
+</span><span class='line'><span class="nt">&lt;/properties&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>         <span class="nt">&lt;plugin&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;groupId&gt;</span>net.thucydides.maven.plugin<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;artifactId&gt;</span>maven-thucydides-jbehave-plugin<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;version&gt;</span>0.9.223-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;executions&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;goal&gt;</span>generate-sources<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/executions&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/plugin&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I hope this will be usefull for someone.</p>
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
     <a href="/blog/archives">Blog Archives</a>
@@ -77,6 +266,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel/">Thucydides+JBehave+Maven Run Tests in Parallel</a>
+      </li>
     
   </ul>
 </section>
@@ -91,7 +284,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2014 - Your Name -
+  Copyright &copy; 2014 - Mike Dolinin -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

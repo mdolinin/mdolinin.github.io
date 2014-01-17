@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Thucydides, | Automatization]]></title>
+  <link href="http://mdolinin.github.io/blog/categories/thucydides/atom.xml" rel="self"/>
+  <link href="http://mdolinin.github.io/"/>
+  <updated>2014-01-17T11:06:25+02:00</updated>
+  <id>http://mdolinin.github.io/</id>
+  <author>
+    <name><![CDATA[Mike Dolinin]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Thucydides+JBehave+Maven Run Tests in Parallel]]></title>
+    <link href="http://mdolinin.github.io/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel/"/>
+    <updated>2014-01-17T05:31:04+02:00</updated>
+    <id>http://mdolinin.github.io/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel</id>
+    <content type="html"><![CDATA[<p>Thucydides is very cool test automation framework, with good built-in support of Selenium/WebDriver, understandable java API, simple architecture. This project also has integration with common BDD frameworks as JBehave and EasyB. Integration with JBehave is done by thucydides-jbehave project <a href="https://github.com/thucydides-webtests/thucydides-jbehave">src</a>.</p>
+
+<p>JBehave allow you to write, store and run you tests in plain text files with <em>.story</em> extension.
+``` gherkin
+Scenario: trader is not alerted below threshold</p>
+
+<p>Given a stock of symbol STK1 and a threshold of 10.0
+When the stock is traded at 5.0
+Then the alert status should be OFF</p>
+
+<p>Scenario: trader is alerted above threshold</p>
+
+<p>Given a stock of symbol STK1 and a threshold of 10.0
+When the stock is traded at 11.0
+Then the alert status should be ON
+```
+Each story file is same as one test suite. That&rsquo;s why it should be atomic and without dependecies from other tests.</p>
+
+<p>The main goal of testing is to provide feedback to developers team as fast as possible. The most powerfull solution to reduce time spent for tests is run them in parallel processes. Now if you use Thucydides and Jbehave frameworks together out of the box, you couldn&rsquo;t run tests in parallel mode.
+But exists severall solutions for this issue.</p>
+
+<p><strong>First</strong> is automatically divide all stories on batches and than run them by some <em>build server</em>. <a href="http://wakaleo.com/index.php/blog/running-parallel-acceptance-tests-using-jbehave-thucydides-and-bamboo">Here</a> is good article writen by Simeon Ross. Witch present how to use this approach by using <a href="https://www.atlassian.com/software/bamboo">Bamboo</a>.</p>
+
+<p><strong>Second</strong> is to use <a href="http://maven.apache.org/surefire/maven-failsafe-plugin/examples/fork-options-and-parallel-execution.html">Maven Failsafe plugin parallel test execution ability</a>. Maven failsafe plugin has ability to run tests using <em>forks</em> by setting the parameter <em>forkCount</em> to a value higher than 1. The parameter <em>forkCount</em> defines the maximum number of JVM processes that Failsafe will spawn concurrently to execute the tests. Below you can find example of this approach.</p>
+
+<p>First of all you should create JUnitStory test for each JBehave story. For example you have <em>use_calendar.story</em> file inside your <em>src/test/resources/stories</em> folder. That&rsquo;s mean you should create UseCalendar class in your <em>src/test/java</em> folder. And extend it from ThucydidesJUnitStory class.
+``` java
+package com.mdolinin.acceptancetest;</p>
+
+<p>import net.thucydides.jbehave.ThucydidesJUnitStory;</p>
+
+<p>public class UseCalendar extends ThucydidesJUnitStory {}
+<code>
+Then made changes in configuration of your pom.xml. We should define where to find our JUnitStory classes and how many forks to use. For example we want to run all our stories in parallel mode.
+</code> xml pom.xml</p>
+
+<pre><code>         &lt;plugin&gt;
+            &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt;
+            &lt;version&gt;2.16&lt;/version&gt;
+            &lt;configuration&gt;
+                &lt;systemPropertyVariables&gt;
+                    &lt;webdriver.driver&gt;${webdriver.driver}&lt;/webdriver.driver&gt;
+                &lt;/systemPropertyVariables&gt;
+                &lt;includes&gt;
+                    &lt;include&gt;**/acceptancetest/*.java&lt;/include&gt;
+                &lt;/includes&gt;
+                &lt;forkMode&gt;perthread&lt;/forkMode&gt;
+                &lt;threadCount&gt;4&lt;/threadCount&gt;
+            &lt;/configuration&gt;
+            &lt;executions&gt;
+                &lt;execution&gt;
+                    &lt;goals&gt;
+                        &lt;goal&gt;integration-test&lt;/goal&gt;
+                        &lt;goal&gt;verify&lt;/goal&gt;
+                    &lt;/goals&gt;
+                &lt;/execution&gt;
+            &lt;/executions&gt;
+        &lt;/plugin&gt;
+</code></pre>
+
+<p><code>
+Now if you run your tests using maven than every story will run in one of four forks.
+</code> bash
+$ mvn integration-test
+<code>
+But it is boring to create new boilerplate class for each story file. That's why I created *maven-thucydides-jbehave-plugin* [src](https://github.com/mdolinin/maven-thucydides-jbehave-plugin) for this job. To use it add to your pom.xml build section with goal *generate-sources* and define *project.junit.stories.package*(where to put generated stubs) in properties section. See example below:
+</code>xml pom.xml</p>
+
+<pre><code>&lt;properties&gt;
+    &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;project.reporting.outputEncoding&gt;UTF-8&lt;/project.reporting.outputEncoding&gt;
+    &lt;webdriver.driver&gt;firefox&lt;/webdriver.driver&gt;
+    &lt;project.junit.stories.package&gt;com.mdolinin.acceptancetest&lt;/project.junit.stories.package&gt;
+&lt;/properties&gt;
+</code></pre>
+
+<p><code>
+</code>xml pom.xml</p>
+
+<pre><code>         &lt;plugin&gt;
+            &lt;groupId&gt;net.thucydides.maven.plugin&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-thucydides-jbehave-plugin&lt;/artifactId&gt;
+            &lt;version&gt;0.9.223-SNAPSHOT&lt;/version&gt;
+            &lt;executions&gt;
+                &lt;execution&gt;
+                    &lt;goals&gt;
+                        &lt;goal&gt;generate-sources&lt;/goal&gt;
+                    &lt;/goals&gt;
+                &lt;/execution&gt;
+            &lt;/executions&gt;
+        &lt;/plugin&gt;
+</code></pre>
+
+<p>```
+I hope this will be usefull for someone.</p>
+]]></content>
+  </entry>
+  
+</feed>
