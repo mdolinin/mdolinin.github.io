@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Maven | Automatization]]></title>
   <link href="http://mdolinin.github.io/blog/categories/maven/atom.xml" rel="self"/>
   <link href="http://mdolinin.github.io/"/>
-  <updated>2014-01-18T15:22:37+02:00</updated>
+  <updated>2014-01-18T15:24:25+02:00</updated>
   <id>http://mdolinin.github.io/</id>
   <author>
     <name><![CDATA[Mike Dolinin]]></name>
@@ -20,7 +20,7 @@
     <id>http://mdolinin.github.io/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel</id>
     <content type="html"><![CDATA[<p>Thucydides is very cool test automation framework, with good built-in support of Selenium/WebDriver, understandable java API, simple architecture. This project also has integration with common BDD frameworks as JBehave and EasyB. Integration with JBehave is done by thucydides-jbehave project <a href="https://github.com/thucydides-webtests/thucydides-jbehave">src</a>.</p>
 
-<p>JBehave allow you to write, store and run you tests in plain text files with <em>.story</em> extension.
+<p>JBehave allows you to write, store and run your tests in plain text files with <em>.story</em> extension.
 ``` gherkin
 Scenario: trader is not alerted below threshold</p>
 
