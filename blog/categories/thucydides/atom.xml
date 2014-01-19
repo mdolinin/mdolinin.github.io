@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Thucydides, | Automatization]]></title>
   <link href="http://mdolinin.github.io/blog/categories/thucydides/atom.xml" rel="self"/>
   <link href="http://mdolinin.github.io/"/>
-  <updated>2014-01-18T17:40:20+02:00</updated>
+  <updated>2014-01-19T15:23:24+02:00</updated>
   <id>http://mdolinin.github.io/</id>
   <author>
     <name><![CDATA[Mike Dolinin]]></name>
@@ -12,6 +12,88 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Thucydides+JBehave+Maven Run Tests in Fixed Order]]></title>
+    <link href="http://mdolinin.github.io/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order/"/>
+    <updated>2014-01-19T13:59:07+02:00</updated>
+    <id>http://mdolinin.github.io/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order</id>
+    <content type="html"><![CDATA[<p>In my previous <a href="/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel">post</a>, I discribed how to run tests in parallel mode using Thucycdides,Jbehave and Maven Failsafe Plugin. But sometimes you need to run tests in fixed order, for example when you:</p>
+
+<ul>
+<li>make some preconditions</li>
+<li>clear data</li>
+<li>import new configuration</li>
+<li>test applications when some services are shutdown</li>
+<li>etc.</li>
+</ul>
+
+
+<p>Maven failsafe plugin has ability to add different executions in fixed order.
+This feature can be used by adding <em>executions</em> sections into failsafe configuration, for each test suite. They will run in the same order as discribed in pom.xml file.</p>
+
+<p>For example you have several <em>*.story</em> files and one of them named Preconditions.story. And you know that according to business logic of your application all stories except Preconditions can be run in parallel order. But Preconditions.story should be executed before others. Then you can use configuration that shown below.
+``` xml pom.xml</p>
+
+<pre><code>    &lt;plugin&gt;
+        &lt;artifactId&gt;maven-failsafe-plugin&lt;/artifactId&gt;
+        &lt;version&gt;2.16&lt;/version&gt;
+        &lt;executions&gt;
+            &lt;execution&gt;
+                &lt;id&gt;preconditions&lt;/id&gt;
+                &lt;goals&gt;
+                    &lt;goal&gt;integration-test&lt;/goal&gt;
+                &lt;/goals&gt;
+                &lt;configuration&gt;
+                    &lt;systemPropertyVariables&gt;
+                        &lt;webdriver.driver&gt;${webdriver.driver}&lt;/webdriver.driver&gt;
+                    &lt;/systemPropertyVariables&gt;
+                    &lt;includes&gt;
+                       &lt;include&gt;**/acceptancetest/Preconditions.java&lt;/include&gt;
+                    &lt;/includes&gt;
+                    &lt;summaryFile&gt;target/failsafe-reports/failsafe-summary-preconditions.xml&lt;/summaryFile&gt;
+                &lt;/configuration&gt;
+            &lt;/execution&gt;
+            &lt;execution&gt;
+               &lt;id&gt;acceptance-test-parallel-execution&lt;/id&gt;
+               &lt;goals&gt;
+                   &lt;goal&gt;integration-test&lt;/goal&gt;
+               &lt;/goals&gt;
+               &lt;configuration&gt;
+                   &lt;systemPropertyVariables&gt;
+                       &lt;webdriver.driver&gt;${webdriver.driver}&lt;/webdriver.driver&gt;
+                   &lt;/systemPropertyVariables&gt;
+                   &lt;includes&gt;
+                       &lt;include&gt;**/acceptancetest/*.java&lt;/include&gt;
+                   &lt;/includes&gt;
+                   &lt;excludes&gt;
+                       &lt;exclude&gt;**/acceptancetest/Preconditions.java&lt;/exclude&gt;
+                   &lt;/excludes&gt;
+                   &lt;forkCount&gt;4&lt;/forkCount&gt;
+                   &lt;reuseForks&gt;true&lt;/reuseForks&gt;
+                   &lt;summaryFile&gt;target/failsafe-reports/failsafe-summary-acceptance-test-parallel-execution.xml&lt;/summaryFile&gt;
+               &lt;/configuration&gt;
+           &lt;/execution&gt;
+           &lt;execution&gt;
+               &lt;id&gt;verify&lt;/id&gt;
+               &lt;goals&gt;
+                   &lt;goal&gt;verify&lt;/goal&gt;
+               &lt;/goals&gt;
+               &lt;configuration&gt;
+                   &lt;summaryFiles&gt;
+                       &lt;summaryFile&gt;target/failsafe-reports/failsafe-summary-acceptance-test-preconditions.xml&lt;/summaryFile&gt;
+                       &lt;summaryFile&gt;target/failsafe-reports/failsafe-summary-acceptance-test-parallel-execution.xml&lt;/summaryFile&gt;
+                   &lt;/summaryFiles&gt;
+               &lt;/configuration&gt;
+           &lt;/execution&gt;
+        &lt;/executions&gt;
+    &lt;/plugin&gt;
+</code></pre>
+
+<p>```
+You can create <em>execution</em> sections as many as you want but this is bad practice, because your tests become dependent and execution time will rise. That&rsquo;s why I suggest to launch most of the tests in one run with parallel mode.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Thucydides+JBehave+Maven Run Tests in Parallel]]></title>

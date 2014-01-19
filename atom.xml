@@ -4,7 +4,7 @@
   <title><![CDATA[Automatization]]></title>
   <link href="http://mdolinin.github.io/atom.xml" rel="self"/>
   <link href="http://mdolinin.github.io/"/>
-  <updated>2014-01-18T17:40:20+02:00</updated>
+  <updated>2014-01-19T15:23:24+02:00</updated>
   <id>http://mdolinin.github.io/</id>
   <author>
     <name><![CDATA[Mike Dolinin]]></name>
@@ -12,6 +12,141 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Thucydides+JBehave+Maven Run Tests in Fixed Order]]></title>
+    <link href="http://mdolinin.github.io/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order/"/>
+    <updated>2014-01-19T13:59:07+02:00</updated>
+    <id>http://mdolinin.github.io/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order</id>
+    <content type="html"><![CDATA[<p>In my previous <a href="http://mdolinin.github.io/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel">post</a>, I discribed how to run tests in parallel mode using Thucycdides,Jbehave and Maven Failsafe Plugin. But sometimes you need to run tests in fixed order, for example when you:</p>
+
+<ul>
+<li>make some preconditions</li>
+<li>clear data</li>
+<li>import new configuration</li>
+<li>test applications when some services are shutdown</li>
+<li>etc.</li>
+</ul>
+
+
+<p>Maven failsafe plugin has ability to add different executions in fixed order.
+This feature can be used by adding <em>executions</em> sections into failsafe configuration, for each test suite. They will run in the same order as discribed in pom.xml file.</p>
+
+<p>For example you have several <em>*.story</em> files and one of them named Preconditions.story. And you know that according to business logic of your application all stories except Preconditions can be run in parallel order. But Preconditions.story should be executed before others. Then you can use configuration that shown below.</p>
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>    <span class="nt">&lt;plugin&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;artifactId&gt;</span>maven-failsafe-plugin<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;version&gt;</span>2.16<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;executions&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>              <span class="nt">&lt;id&gt;</span>preconditions<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                  <span class="nt">&lt;goal&gt;</span>integration-test<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>                  <span class="nt">&lt;systemPropertyVariables&gt;</span>
+</span><span class='line'>                      <span class="nt">&lt;webdriver.driver&gt;</span>${webdriver.driver}<span class="nt">&lt;/webdriver.driver&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/systemPropertyVariables&gt;</span>
+</span><span class='line'>                  <span class="nt">&lt;includes&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;include&gt;</span>**/acceptancetest/Preconditions.java<span class="nt">&lt;/include&gt;</span>
+</span><span class='line'>                  <span class="nt">&lt;/includes&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;summaryFile&gt;</span>target/failsafe-reports/failsafe-summary-preconditions.xml<span class="nt">&lt;/summaryFile&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;id&gt;</span>acceptance-test-parallel-execution<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;goal&gt;</span>integration-test<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;systemPropertyVariables&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;webdriver.driver&gt;</span>${webdriver.driver}<span class="nt">&lt;/webdriver.driver&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;/systemPropertyVariables&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;includes&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;include&gt;</span>**/acceptancetest/*.java<span class="nt">&lt;/include&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;/includes&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;excludes&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;exclude&gt;</span>**/acceptancetest/Preconditions.java<span class="nt">&lt;/exclude&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;/excludes&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;forkCount&gt;</span>4<span class="nt">&lt;/forkCount&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;reuseForks&gt;</span>true<span class="nt">&lt;/reuseForks&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;summaryFile&gt;</span>target/failsafe-reports/failsafe-summary-acceptance-test-parallel-execution.xml<span class="nt">&lt;/summaryFile&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>         <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>         <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;id&gt;</span>verify<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;goal&gt;</span>verify<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;summaryFiles&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;summaryFile&gt;</span>target/failsafe-reports/failsafe-summary-acceptance-test-preconditions.xml<span class="nt">&lt;/summaryFile&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;summaryFile&gt;</span>target/failsafe-reports/failsafe-summary-acceptance-test-parallel-execution.xml<span class="nt">&lt;/summaryFile&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;/summaryFiles&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>         <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/executions&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/plugin&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+You can create <em>execution</em> sections as many as you want but this is bad practice, because your tests become dependent and execution time will rise. That&rsquo;s why I suggest to launch most of the tests in one run with parallel mode.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Thucydides+JBehave+Maven Run Tests in Parallel]]></title>
