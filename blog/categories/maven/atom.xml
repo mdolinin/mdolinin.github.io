@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Maven | Automatization]]></title>
   <link href="http://mdolinin.github.io/blog/categories/maven/atom.xml" rel="self"/>
   <link href="http://mdolinin.github.io/"/>
-  <updated>2014-01-19T15:23:24+02:00</updated>
+  <updated>2014-01-20T09:47:38+02:00</updated>
   <id>http://mdolinin.github.io/</id>
   <author>
     <name><![CDATA[Mike Dolinin]]></name>
@@ -27,6 +27,9 @@
 <li>test applications when some services are shutdown</li>
 <li>etc.</li>
 </ul>
+
+
+<!-- more -->
 
 
 <p>Maven failsafe plugin has ability to add different executions in fixed order.
@@ -120,6 +123,9 @@ Each story file is same as one test suite. That&rsquo;s why it should be atomic 
 
 <p>The main goal of testing is to provide feedback to developers team as fast as possible. The most powerfull solution to reduce time spent for tests is run them in parallel processes. Now if you use Thucydides and Jbehave frameworks together out of the box, you can&rsquo;t run tests in parallel mode.
 But exists severall solutions for this issue.</p>
+
+<!-- more -->
+
 
 <p><strong>First</strong> is to divide automatically all stories on batches and then run them by some <em>build server</em>. <a href="http://wakaleo.com/index.php/blog/running-parallel-acceptance-tests-using-jbehave-thucydides-and-bamboo">Here</a> is a good article written by Simeon Ross, witch presents how to use this approach by using <a href="https://www.atlassian.com/software/bamboo">Bamboo</a>.</p>
 

@@ -140,6 +140,9 @@
 <p>The main goal of testing is to provide feedback to developers team as fast as possible. The most powerfull solution to reduce time spent for tests is run them in parallel processes. Now if you use Thucydides and Jbehave frameworks together out of the box, you can&rsquo;t run tests in parallel mode.
 But exists severall solutions for this issue.</p>
 
+<!-- more -->
+
+
 <p><strong>First</strong> is to divide automatically all stories on batches and then run them by some <em>build server</em>. <a href="http://wakaleo.com/index.php/blog/running-parallel-acceptance-tests-using-jbehave-thucydides-and-bamboo">Here</a> is a good article written by Simeon Ross, witch presents how to use this approach by using <a href="https://www.atlassian.com/software/bamboo">Bamboo</a>.</p>
 
 <p><strong>Second</strong> is to use <a href="http://maven.apache.org/surefire/maven-failsafe-plugin/examples/fork-options-and-parallel-execution.html">Maven Failsafe plugin parallel test execution ability</a>. Maven failsafe plugin has ability to run tests using <em>forks</em> by setting the parameter <em>forkCount</em> to a value higher than 1. The parameter <em>forkCount</em> defines the maximum number of JVM processes that Failsafe will spawn concurrently to execute the tests. Below you can find an example of this approach.</p>
