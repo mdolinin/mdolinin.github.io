@@ -4,7 +4,7 @@
   <title><![CDATA[Automatization]]></title>
   <link href="http://mdolinin.github.io/atom.xml" rel="self"/>
   <link href="http://mdolinin.github.io/"/>
-  <updated>2014-01-20T09:47:38+02:00</updated>
+  <updated>2014-01-20T13:30:06+02:00</updated>
   <id>http://mdolinin.github.io/</id>
   <author>
     <name><![CDATA[Mike Dolinin]]></name>
@@ -193,11 +193,11 @@ But exists severall solutions for this issue.</p>
 <!-- more -->
 
 
-<p><strong>First</strong> is to divide automatically all stories on batches and then run them by some <em>build server</em>. <a href="http://wakaleo.com/index.php/blog/running-parallel-acceptance-tests-using-jbehave-thucydides-and-bamboo">Here</a> is a good article written by Simeon Ross, witch presents how to use this approach by using <a href="https://www.atlassian.com/software/bamboo">Bamboo</a>.</p>
+<p><strong>First</strong> is to divide automatically all stories on batches and then run them by some <em>build server</em>. <a href="http://wakaleo.com/index.php/blog/running-parallel-acceptance-tests-using-jbehave-thucydides-and-bamboo">Here</a> is a good article written by Simeon Ross, which presents how to use this approach by using <a href="https://www.atlassian.com/software/bamboo">Bamboo</a>.</p>
 
 <p><strong>Second</strong> is to use <a href="http://maven.apache.org/surefire/maven-failsafe-plugin/examples/fork-options-and-parallel-execution.html">Maven Failsafe plugin parallel test execution ability</a>. Maven failsafe plugin has ability to run tests using <em>forks</em> by setting the parameter <em>forkCount</em> to a value higher than 1. The parameter <em>forkCount</em> defines the maximum number of JVM processes that Failsafe will spawn concurrently to execute the tests. Below you can find an example of this approach.</p>
 
-<p>First of all you should create JUnitStory test for each JBehave story. For example you have <em>use_calendar.story</em> file inside your <em>src/test/resources/stories</em> folder. That means you should create UseCalendar class in your <em>src/test/java</em> folder and extend it from ThucydidesJUnitStory class.</p>
+<p>First of all you should create JUnitStory test for each JBehave story. For example you have <em>use_calendar.story</em> file inside your <em>src/test/resources/stories</em> folder. That means you should create UseCalendar class in your <em>src/test/java</em> folder and extend it from ThucydidesJUnitStory class. Class name should be same as story name and match to java syntax (use &ldquo;CamelCase&rdquo; without spaces).</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
