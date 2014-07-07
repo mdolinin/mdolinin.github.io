@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Maven | Automatization]]></title>
   <link href="http://mdolinin.github.io/blog/categories/maven/atom.xml" rel="self"/>
   <link href="http://mdolinin.github.io/"/>
-  <updated>2014-01-20T13:30:06+02:00</updated>
+  <updated>2014-07-07T17:48:26+03:00</updated>
   <id>http://mdolinin.github.io/</id>
   <author>
     <name><![CDATA[Mike Dolinin]]></name>
@@ -12,6 +12,162 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Thucydides+JBehave+Maven Generate New Steps From Scenarios]]></title>
+    <link href="http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/"/>
+    <updated>2014-07-07T10:30:39+03:00</updated>
+    <id>http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios</id>
+    <content type="html"><![CDATA[<p>If you are using Jbehave framework, you know that it has very simple structure of <em>.story</em> file content.
+Which consists of steps &ndash; Given,When,Then. And only steps are required part of the story. But this framework provides us to add meta-information to our tests for better understanding. One of the way to do this is use <em>Scenario:</em> sections.
+``` gherkin
+Scenario: log in as autorized user</p>
+
+<p>Given user on authorization page
+When he logs in as John with password 123
+Then opens user&rsquo;s page
+```
+It is very useful feature, which divide story into sections and makes it more readable/understandable.
+But you can use <em>Scenario</em> to create your own steps library automatically.</p>
+
+<!-- more -->
+
+
+<p>To do this you need <em>maven-thucydides-jbehave-plugin</em> <a href="https://github.com/mdolinin/maven-thucydides-jbehave-plugin">src</a>. Add it to your pom.xml build section with goal <em>generate-steps</em>. See example below:
+```xml pom.xml</p>
+
+<pre><code>         &lt;plugin&gt;
+            &lt;groupId&gt;net.thucydides.maven.plugin&lt;/groupId&gt;
+            &lt;artifactId&gt;maven-thucydides-jbehave-plugin&lt;/artifactId&gt;
+            &lt;version&gt;0.9.223&lt;/version&gt;
+            &lt;executions&gt;
+                &lt;execution&gt;
+                    &lt;goals&gt;
+                        &lt;goal&gt;generate-steps&lt;/goal&gt;
+                    &lt;/goals&gt;
+                &lt;/execution&gt;
+            &lt;/executions&gt;
+        &lt;/plugin&gt;
+</code></pre>
+
+<p>```
+This plugin starts working on phase <em>process-test-classes</em> (by default).</p>
+
+<p>And as result will <em>generate new <strong>When</strong> steps for each <strong>Scenario</strong> section</em>.</p>
+
+<p>Let&rsquo;s see his work on example. If you have APassingBehavior.story file with scenario shown above inside,
+then plugin execution create class with two new steps.
+```java APassingBehaviorSteps.java
+package net.thucydides.maven.plugin.test;</p>
+
+<p>import net.thucydides.maven.plugin.test.LoginSteps;
+import java.lang.String;
+import net.thucydides.core.annotations.Steps;
+import net.thucydides.core.pages.Pages;
+import net.thucydides.core.steps.ScenarioSteps;
+import org.jbehave.core.annotations.When;</p>
+
+<p>public class APassingBehaviorSteps extends ScenarioSteps {</p>
+
+<pre><code>private static final long serialVersionUID = 1L;
+
+@Steps
+private LoginSteps loginSteps;
+
+public APassingBehaviorSteps(Pages pages) {
+    super(pages);
+}
+
+@When("log in as autorized user $login $pass")
+public void logInAsAutorizedUser(String login, String pass) {
+    loginSteps.givenUserOnAuthorizationPage();
+    loginSteps.whenHeLogsInWithPassword(login, pass);
+    loginSteps.thenOpensUsersPage();
+}
+
+@When("log in as autorized user")
+public void logInAsAutorizedUser() {
+    loginSteps.givenUserOnAuthorizationPage();
+    loginSteps.whenHeLogsInWithPassword("John", "123");
+    loginSteps.thenOpensUsersPage();
+}
+</code></pre>
+
+<p>}
+```
+In result:</p>
+
+<ul>
+<li>steps will have name as scenario title</li>
+<li>first step will require to enter all parameters from inside steps explicitly</li>
+<li>second step will use parameters from scenario</li>
+<li>you can rewrite scenario to one step
+<code>gherkin
+When log in as autorized user
+</code></li>
+<li>or
+<code>gherkin
+When log in as autorized user John 123
+</code></li>
+</ul>
+
+
+<p>Also you can create <em>parameterized Scenario Steps</em> using &lsquo;$&rsquo; sign, like in Jbehave.
+Add parameters from any inside step to scenario title.
+``` gherkin
+Scenario: log in as $login user</p>
+
+<p>Given user on authorization page
+When he logs in as John with password 123
+Then opens user&rsquo;s page
+<code>
+And rerun plugin.
+</code>java APassingBehaviorSteps.java
+package net.thucydides.maven.plugin.test;</p>
+
+<p>import net.thucydides.maven.plugin.test.LoginSteps;
+import java.lang.String;
+import net.thucydides.core.annotations.Steps;
+import net.thucydides.core.pages.Pages;
+import net.thucydides.core.steps.ScenarioSteps;
+import org.jbehave.core.annotations.When;</p>
+
+<p>public class APassingBehaviorSteps extends ScenarioSteps {</p>
+
+<pre><code>private static final long serialVersionUID = 1L;
+
+@Steps
+private LoginSteps loginSteps;
+
+public APassingBehaviorSteps(Pages pages) {
+    super(pages);
+}
+
+@When("log in as $login $pass")
+public void logInAslogin(String login, String pass) {
+    loginSteps.givenUserOnAuthorizationPage();
+    loginSteps.whenHeLogsInWithPassword(login, pass);
+    loginSteps.thenOpensUsersPage();
+}
+
+@When("log in as $login")
+public void logInAslogin(String login) {
+    loginSteps.givenUserOnAuthorizationPage();
+    loginSteps.whenHeLogsInWithPassword(login, "123");
+    loginSteps.thenOpensUsersPage();
+}
+</code></pre>
+
+<p>}
+<code>
+So now you can use your login step.
+</code> gherkin
+When log in as John
+```</p>
+
+<p>I hope this will be usefull for someone.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Thucydides+JBehave+Maven Run Tests in Fixed Order]]></title>

@@ -9,7 +9,8 @@
   <meta name="author" content="Mike Dolinin">
 
   
-  <meta name="description" content="In my previous post, I discribed how to run tests in parallel mode using Thucycdides,Jbehave and Maven Failsafe Plugin. But sometimes you need to run &hellip;">
+  <meta name="description" content="If you are using Jbehave framework, you know that it has very simple structure of .story file content.
+Which consists of steps &ndash; Given,When, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +78,67 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/">Thucydides+JBehave+Maven Generate New Steps From Scenarios</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-07-07T10:30:39+03:00" pubdate data-updated="true">Jul 7<span>th</span>, 2014</time>
+        
+           | <a href="/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/#disqus_thread"
+             data-disqus-identifier="http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you are using Jbehave framework, you know that it has very simple structure of <em>.story</em> file content.
+Which consists of steps &ndash; Given,When,Then. And only steps are required part of the story. But this framework provides us to add meta-information to our tests for better understanding. One of the way to do this is use <em>Scenario:</em> sections.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">Scenario:</span><span class="nf"> log in as autorized user</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">Given </span><span class="nf">user on authorization page</span>
+</span><span class='line'><span class="k">When </span><span class="nf">he logs in as John with password </span><span class="s">123</span><span class="nf"></span>
+</span><span class='line'><span class="k">Then </span><span class="nf">opens user&#39;s page</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It is very useful feature, which divide story into sections and makes it more readable/understandable.
+But you can use <em>Scenario</em> to create your own steps library automatically.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -218,6 +280,10 @@ But exists severall solutions for this issue.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/">Thucydides+JBehave+Maven Generate New Steps From Scenarios</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order/">Thucydides+JBehave+Maven Run Tests in Fixed Order</a>

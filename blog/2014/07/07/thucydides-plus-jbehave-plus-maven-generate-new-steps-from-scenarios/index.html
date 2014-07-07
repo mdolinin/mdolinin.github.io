@@ -1,0 +1,552 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Thucydides+JBehave+Maven Generate New Steps From Scenarios - Automatization</title>
+  <meta name="author" content="Mike Dolinin">
+
+  
+  <meta name="description" content="If you are using Jbehave framework, you know that it has very simple structure of .story file content.
+Which consists of steps &ndash; Given,When, &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Automatization" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-47283125-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Automatization</a></h1>
+  
+    <h2>Build the right tools right</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:mdolinin.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Thucydides+JBehave+Maven Generate New Steps From Scenarios</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-07-07T10:30:39+03:00" pubdate data-updated="true">Jul 7<span>th</span>, 2014</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://mdolinin.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>If you are using Jbehave framework, you know that it has very simple structure of <em>.story</em> file content.
+Which consists of steps &ndash; Given,When,Then. And only steps are required part of the story. But this framework provides us to add meta-information to our tests for better understanding. One of the way to do this is use <em>Scenario:</em> sections.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">Scenario:</span><span class="nf"> log in as autorized user</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">Given </span><span class="nf">user on authorization page</span>
+</span><span class='line'><span class="k">When </span><span class="nf">he logs in as John with password </span><span class="s">123</span><span class="nf"></span>
+</span><span class='line'><span class="k">Then </span><span class="nf">opens user&#39;s page</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It is very useful feature, which divide story into sections and makes it more readable/understandable.
+But you can use <em>Scenario</em> to create your own steps library automatically.</p>
+
+<!-- more -->
+
+
+<p>To do this you need <em>maven-thucydides-jbehave-plugin</em> <a href="https://github.com/mdolinin/maven-thucydides-jbehave-plugin">src</a>. Add it to your pom.xml build section with goal <em>generate-steps</em>. See example below:</p>
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>         <span class="nt">&lt;plugin&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;groupId&gt;</span>net.thucydides.maven.plugin<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;artifactId&gt;</span>maven-thucydides-jbehave-plugin<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;version&gt;</span>0.9.223<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;executions&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;goal&gt;</span>generate-steps<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/executions&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/plugin&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+This plugin starts working on phase <em>process-test-classes</em> (by default).</p>
+
+<p>And as result will <em>generate new <strong>When</strong> steps for each <strong>Scenario</strong> section</em>.</p>
+
+<p>Let&rsquo;s see his work on example. If you have APassingBehavior.story file with scenario shown above inside,
+then plugin execution create class with two new steps.</p>
+
+<figure class='code'><figcaption><span>APassingBehaviorSteps.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">net</span><span class="o">.</span><span class="na">thucydides</span><span class="o">.</span><span class="na">maven</span><span class="o">.</span><span class="na">plugin</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.maven.plugin.test.LoginSteps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.lang.String</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.annotations.Steps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.pages.Pages</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.steps.ScenarioSteps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.jbehave.core.annotations.When</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">APassingBehaviorSteps</span> <span class="kd">extends</span> <span class="n">ScenarioSteps</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="mi">1L</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Steps</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">LoginSteps</span> <span class="n">loginSteps</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">APassingBehaviorSteps</span><span class="o">(</span><span class="n">Pages</span> <span class="n">pages</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">(</span><span class="n">pages</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@When</span><span class="o">(</span><span class="s">&quot;log in as autorized user $login $pass&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">logInAsAutorizedUser</span><span class="o">(</span><span class="n">String</span> <span class="n">login</span><span class="o">,</span> <span class="n">String</span> <span class="n">pass</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">givenUserOnAuthorizationPage</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">whenHeLogsInWithPassword</span><span class="o">(</span><span class="n">login</span><span class="o">,</span> <span class="n">pass</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">thenOpensUsersPage</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@When</span><span class="o">(</span><span class="s">&quot;log in as autorized user&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">logInAsAutorizedUser</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">givenUserOnAuthorizationPage</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">whenHeLogsInWithPassword</span><span class="o">(</span><span class="s">&quot;John&quot;</span><span class="o">,</span> <span class="s">&quot;123&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">thenOpensUsersPage</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In result:</p>
+
+<ul>
+<li>steps will have name as scenario title</li>
+<li>first step will require to enter all parameters from inside steps explicitly</li>
+<li>second step will use parameters from scenario</li>
+<li>you can rewrite scenario to one step</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">When </span><span class="nf">log in as autorized user</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>or</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">When </span><span class="nf">log in as autorized user John </span><span class="s">123</span><span class="nf"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Also you can create <em>parameterized Scenario Steps</em> using &lsquo;$&rsquo; sign, like in Jbehave.
+Add parameters from any inside step to scenario title.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">Scenario:</span><span class="nf"> log in as $login user</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">Given </span><span class="nf">user on authorization page</span>
+</span><span class='line'><span class="k">When </span><span class="nf">he logs in as John with password </span><span class="s">123</span><span class="nf"></span>
+</span><span class='line'><span class="k">Then </span><span class="nf">opens user&#39;s page</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And rerun plugin.</p>
+
+<figure class='code'><figcaption><span>APassingBehaviorSteps.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">net</span><span class="o">.</span><span class="na">thucydides</span><span class="o">.</span><span class="na">maven</span><span class="o">.</span><span class="na">plugin</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.maven.plugin.test.LoginSteps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.lang.String</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.annotations.Steps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.pages.Pages</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.steps.ScenarioSteps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.jbehave.core.annotations.When</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">APassingBehaviorSteps</span> <span class="kd">extends</span> <span class="n">ScenarioSteps</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="mi">1L</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Steps</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">LoginSteps</span> <span class="n">loginSteps</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">APassingBehaviorSteps</span><span class="o">(</span><span class="n">Pages</span> <span class="n">pages</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">(</span><span class="n">pages</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@When</span><span class="o">(</span><span class="s">&quot;log in as $login $pass&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">logInAslogin</span><span class="o">(</span><span class="n">String</span> <span class="n">login</span><span class="o">,</span> <span class="n">String</span> <span class="n">pass</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">givenUserOnAuthorizationPage</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">whenHeLogsInWithPassword</span><span class="o">(</span><span class="n">login</span><span class="o">,</span> <span class="n">pass</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">thenOpensUsersPage</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@When</span><span class="o">(</span><span class="s">&quot;log in as $login&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">logInAslogin</span><span class="o">(</span><span class="n">String</span> <span class="n">login</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">givenUserOnAuthorizationPage</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">whenHeLogsInWithPassword</span><span class="o">(</span><span class="n">login</span><span class="o">,</span> <span class="s">&quot;123&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">thenOpensUsersPage</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So now you can use your login step.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">When </span><span class="nf">log in as John</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I hope this will be usefull for someone.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Mike Dolinin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-07-07T10:30:39+03:00" pubdate data-updated="true">Jul 7<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/jbehave/'>Jbehave</a>, <a class='category' href='/blog/categories/maven/'>Maven</a>, <a class='category' href='/blog/categories/thucydides/'>Thucydides</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/" data-via="dmo_builder" data-counturl="http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order/" title="Previous Post: Thucydides+JBehave+Maven run tests in fixed order">&laquo; Thucydides+JBehave+Maven run tests in fixed order</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/">Thucydides+JBehave+Maven Generate New Steps From Scenarios</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order/">Thucydides+JBehave+Maven Run Tests in Fixed Order</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel/">Thucydides+JBehave+Maven Run Tests in Parallel</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/mdolinin">@mdolinin</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'mdolinin',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Mike Dolinin -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mdoliningithubio';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/';
+        var disqus_url = 'http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
