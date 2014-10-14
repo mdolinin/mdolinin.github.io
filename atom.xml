@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Automatization]]></title>
+  <link href="http://mdolinin.github.io/atom.xml" rel="self"/>
+  <link href="http://mdolinin.github.io/"/>
+  <updated>2014-07-07T17:48:26+03:00</updated>
+  <id>http://mdolinin.github.io/</id>
+  <author>
+    <name><![CDATA[Mike Dolinin]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Thucydides+JBehave+Maven Generate New Steps From Scenarios]]></title>
+    <link href="http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/"/>
+    <updated>2014-07-07T10:30:39+03:00</updated>
+    <id>http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios</id>
+    <content type="html"><![CDATA[<p>If you are using Jbehave framework, you know that it has very simple structure of <em>.story</em> file content.
+Which consists of steps &ndash; Given,When,Then. And only steps are required part of the story. But this framework provides us to add meta-information to our tests for better understanding. One of the way to do this is use <em>Scenario:</em> sections.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">Scenario:</span><span class="nf"> log in as autorized user</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">Given </span><span class="nf">user on authorization page</span>
+</span><span class='line'><span class="k">When </span><span class="nf">he logs in as John with password </span><span class="s">123</span><span class="nf"></span>
+</span><span class='line'><span class="k">Then </span><span class="nf">opens user&#39;s page</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It is very useful feature, which divide story into sections and makes it more readable/understandable.
+But you can use <em>Scenario</em> to create your own steps library automatically.</p>
+
+<!-- more -->
+
+
+<p>To do this you need <em>maven-thucydides-jbehave-plugin</em> <a href="https://github.com/mdolinin/maven-thucydides-jbehave-plugin">src</a>. Add it to your pom.xml build section with goal <em>generate-steps</em>. See example below:</p>
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>         <span class="nt">&lt;plugin&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;groupId&gt;</span>net.thucydides.maven.plugin<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;artifactId&gt;</span>maven-thucydides-jbehave-plugin<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;version&gt;</span>0.9.223<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;executions&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;goal&gt;</span>generate-steps<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/executions&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/plugin&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+This plugin starts working on phase <em>process-test-classes</em> (by default).</p>
+
+<p>And as result will <em>generate new <strong>When</strong> steps for each <strong>Scenario</strong> section</em>.</p>
+
+<p>Let&rsquo;s see his work on example. If you have APassingBehavior.story file with scenario shown above inside,
+then plugin execution create class with two new steps.</p>
+
+<figure class='code'><figcaption><span>APassingBehaviorSteps.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">net</span><span class="o">.</span><span class="na">thucydides</span><span class="o">.</span><span class="na">maven</span><span class="o">.</span><span class="na">plugin</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.maven.plugin.test.LoginSteps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.lang.String</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.annotations.Steps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.pages.Pages</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.steps.ScenarioSteps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.jbehave.core.annotations.When</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">APassingBehaviorSteps</span> <span class="kd">extends</span> <span class="n">ScenarioSteps</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="mi">1L</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Steps</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">LoginSteps</span> <span class="n">loginSteps</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">APassingBehaviorSteps</span><span class="o">(</span><span class="n">Pages</span> <span class="n">pages</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">(</span><span class="n">pages</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@When</span><span class="o">(</span><span class="s">&quot;log in as autorized user $login $pass&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">logInAsAutorizedUser</span><span class="o">(</span><span class="n">String</span> <span class="n">login</span><span class="o">,</span> <span class="n">String</span> <span class="n">pass</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">givenUserOnAuthorizationPage</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">whenHeLogsInWithPassword</span><span class="o">(</span><span class="n">login</span><span class="o">,</span> <span class="n">pass</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">thenOpensUsersPage</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@When</span><span class="o">(</span><span class="s">&quot;log in as autorized user&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">logInAsAutorizedUser</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">givenUserOnAuthorizationPage</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">whenHeLogsInWithPassword</span><span class="o">(</span><span class="s">&quot;John&quot;</span><span class="o">,</span> <span class="s">&quot;123&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">thenOpensUsersPage</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In result:</p>
+
+<ul>
+<li>steps will have name as scenario title</li>
+<li>first step will require to enter all parameters from inside steps explicitly</li>
+<li>second step will use parameters from scenario</li>
+<li>you can rewrite scenario to one step</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">When </span><span class="nf">log in as autorized user</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>or</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">When </span><span class="nf">log in as autorized user John </span><span class="s">123</span><span class="nf"></span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Also you can create <em>parameterized Scenario Steps</em> using &lsquo;$&rsquo; sign, like in Jbehave.
+Add parameters from any inside step to scenario title.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">Scenario:</span><span class="nf"> log in as $login user</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">Given </span><span class="nf">user on authorization page</span>
+</span><span class='line'><span class="k">When </span><span class="nf">he logs in as John with password </span><span class="s">123</span><span class="nf"></span>
+</span><span class='line'><span class="k">Then </span><span class="nf">opens user&#39;s page</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And rerun plugin.</p>
+
+<figure class='code'><figcaption><span>APassingBehaviorSteps.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">net</span><span class="o">.</span><span class="na">thucydides</span><span class="o">.</span><span class="na">maven</span><span class="o">.</span><span class="na">plugin</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.maven.plugin.test.LoginSteps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">java.lang.String</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.annotations.Steps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.pages.Pages</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.core.steps.ScenarioSteps</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">org.jbehave.core.annotations.When</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">APassingBehaviorSteps</span> <span class="kd">extends</span> <span class="n">ScenarioSteps</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="mi">1L</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Steps</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">LoginSteps</span> <span class="n">loginSteps</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">APassingBehaviorSteps</span><span class="o">(</span><span class="n">Pages</span> <span class="n">pages</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">(</span><span class="n">pages</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@When</span><span class="o">(</span><span class="s">&quot;log in as $login $pass&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">logInAslogin</span><span class="o">(</span><span class="n">String</span> <span class="n">login</span><span class="o">,</span> <span class="n">String</span> <span class="n">pass</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">givenUserOnAuthorizationPage</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">whenHeLogsInWithPassword</span><span class="o">(</span><span class="n">login</span><span class="o">,</span> <span class="n">pass</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">thenOpensUsersPage</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@When</span><span class="o">(</span><span class="s">&quot;log in as $login&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">logInAslogin</span><span class="o">(</span><span class="n">String</span> <span class="n">login</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">givenUserOnAuthorizationPage</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">whenHeLogsInWithPassword</span><span class="o">(</span><span class="n">login</span><span class="o">,</span> <span class="s">&quot;123&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">loginSteps</span><span class="o">.</span><span class="na">thenOpensUsersPage</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So now you can use your login step.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">When </span><span class="nf">log in as John</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I hope this will be usefull for someone.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Thucydides+JBehave+Maven Run Tests in Fixed Order]]></title>
+    <link href="http://mdolinin.github.io/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order/"/>
+    <updated>2014-01-19T13:59:07+02:00</updated>
+    <id>http://mdolinin.github.io/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order</id>
+    <content type="html"><![CDATA[<p>In my previous <a href="http://mdolinin.github.io/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel">post</a>, I discribed how to run tests in parallel mode using Thucycdides,Jbehave and Maven Failsafe Plugin. But sometimes you need to run tests in fixed order, for example when you:</p>
+
+<ul>
+<li>make some preconditions</li>
+<li>clear data</li>
+<li>import new configuration</li>
+<li>test applications when some services are shutdown</li>
+<li>etc.</li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>Maven failsafe plugin has ability to add different executions in fixed order.
+This feature can be used by adding <em>executions</em> sections into failsafe configuration, for each test suite. They will run in the same order as discribed in pom.xml file.</p>
+
+<p>For example you have several <em>*.story</em> files and one of them named Preconditions.story. And you know that according to business logic of your application all stories except Preconditions can be run in parallel order. But Preconditions.story should be executed before others. Then you can use configuration that shown below.</p>
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>    <span class="nt">&lt;plugin&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;artifactId&gt;</span>maven-failsafe-plugin<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;version&gt;</span>2.16<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;executions&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>              <span class="nt">&lt;id&gt;</span>preconditions<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                  <span class="nt">&lt;goal&gt;</span>integration-test<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>                  <span class="nt">&lt;systemPropertyVariables&gt;</span>
+</span><span class='line'>                      <span class="nt">&lt;webdriver.driver&gt;</span>${webdriver.driver}<span class="nt">&lt;/webdriver.driver&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/systemPropertyVariables&gt;</span>
+</span><span class='line'>                  <span class="nt">&lt;includes&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;include&gt;</span>**/acceptancetest/Preconditions.java<span class="nt">&lt;/include&gt;</span>
+</span><span class='line'>                  <span class="nt">&lt;/includes&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;summaryFile&gt;</span>target/failsafe-reports/failsafe-summary-preconditions.xml<span class="nt">&lt;/summaryFile&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;id&gt;</span>acceptance-test-parallel-execution<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;goal&gt;</span>integration-test<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;systemPropertyVariables&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;webdriver.driver&gt;</span>${webdriver.driver}<span class="nt">&lt;/webdriver.driver&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;/systemPropertyVariables&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;includes&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;include&gt;</span>**/acceptancetest/*.java<span class="nt">&lt;/include&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;/includes&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;excludes&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;exclude&gt;</span>**/acceptancetest/Preconditions.java<span class="nt">&lt;/exclude&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;/excludes&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;forkCount&gt;</span>4<span class="nt">&lt;/forkCount&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;reuseForks&gt;</span>true<span class="nt">&lt;/reuseForks&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;summaryFile&gt;</span>target/failsafe-reports/failsafe-summary-acceptance-test-parallel-execution.xml<span class="nt">&lt;/summaryFile&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>         <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>         <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;id&gt;</span>verify<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;goal&gt;</span>verify<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;summaryFiles&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;summaryFile&gt;</span>target/failsafe-reports/failsafe-summary-acceptance-test-preconditions.xml<span class="nt">&lt;/summaryFile&gt;</span>
+</span><span class='line'>                     <span class="nt">&lt;summaryFile&gt;</span>target/failsafe-reports/failsafe-summary-acceptance-test-parallel-execution.xml<span class="nt">&lt;/summaryFile&gt;</span>
+</span><span class='line'>                 <span class="nt">&lt;/summaryFiles&gt;</span>
+</span><span class='line'>             <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>         <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/executions&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/plugin&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+You can create <em>execution</em> sections as many as you want but this is bad practice, because your tests become dependent and execution time will rise. That&rsquo;s why I suggest to launch most of the tests in one run with parallel mode.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Thucydides+JBehave+Maven Run Tests in Parallel]]></title>
+    <link href="http://mdolinin.github.io/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel/"/>
+    <updated>2014-01-17T05:31:04+02:00</updated>
+    <id>http://mdolinin.github.io/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel</id>
+    <content type="html"><![CDATA[<p>Thucydides is very cool test automation framework, with good built-in support of Selenium/WebDriver, understandable java API, simple architecture. This project also has integration with common BDD frameworks as JBehave and EasyB. Integration with JBehave is done by thucydides-jbehave project <a href="https://github.com/thucydides-webtests/thucydides-jbehave">src</a>.</p>
+
+<p>JBehave allows you to write, store and run your tests in plain text files with <em>.story</em> extension.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='gherkin'><span class='line'><span class="k">Scenario:</span><span class="nf"> trader is not alerted below threshold</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">Given </span><span class="nf">a stock of symbol STK</span><span class="s">1</span><span class="nf"> and a threshold of </span><span class="s">10.0</span><span class="nf"></span>
+</span><span class='line'><span class="k">When </span><span class="nf">the stock is traded at </span><span class="s">5.0</span><span class="nf"></span>
+</span><span class='line'><span class="k">Then </span><span class="nf">the alert status should be OFF</span>
+</span><span class='line'><span class="nf"> </span>
+</span><span class='line'><span class="k">Scenario:</span><span class="nf"> trader is alerted above threshold</span>
+</span><span class='line'><span class="k"> </span>
+</span><span class='line'><span class="k">Given </span><span class="nf">a stock of symbol STK</span><span class="s">1</span><span class="nf"> and a threshold of </span><span class="s">10.0</span><span class="nf"></span>
+</span><span class='line'><span class="k">When </span><span class="nf">the stock is traded at </span><span class="s">11.0</span><span class="nf"></span>
+</span><span class='line'><span class="k">Then </span><span class="nf">the alert status should be ON</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Each story file is same as one test suite. That&rsquo;s why it should be atomic and without dependecies from other tests.</p>
+
+<p>The main goal of testing is to provide feedback to developers team as fast as possible. The most powerfull solution to reduce time spent for tests is run them in parallel processes. Now if you use Thucydides and Jbehave frameworks together out of the box, you can&rsquo;t run tests in parallel mode.
+But exists severall solutions for this issue.</p>
+
+<!-- more -->
+
+
+<p><strong>First</strong> is to divide automatically all stories on batches and then run them by some <em>build server</em>. <a href="http://wakaleo.com/index.php/blog/running-parallel-acceptance-tests-using-jbehave-thucydides-and-bamboo">Here</a> is a good article written by Simeon Ross, which presents how to use this approach by using <a href="https://www.atlassian.com/software/bamboo">Bamboo</a>.</p>
+
+<p><strong>Second</strong> is to use <a href="http://maven.apache.org/surefire/maven-failsafe-plugin/examples/fork-options-and-parallel-execution.html">Maven Failsafe plugin parallel test execution ability</a>. Maven failsafe plugin has ability to run tests using <em>forks</em> by setting the parameter <em>forkCount</em> to a value higher than 1. The parameter <em>forkCount</em> defines the maximum number of JVM processes that Failsafe will spawn concurrently to execute the tests. Below you can find an example of this approach.</p>
+
+<p>First of all you should create JUnitStory test for each JBehave story. For example you have <em>use_calendar.story</em> file inside your <em>src/test/resources/stories</em> folder. That means you should create UseCalendar class in your <em>src/test/java</em> folder and extend it from ThucydidesJUnitStory class. Class name should be same as story name and match to java syntax (use &ldquo;CamelCase&rdquo; without spaces).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">mdolinin</span><span class="o">.</span><span class="na">acceptancetest</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">net.thucydides.jbehave.ThucydidesJUnitStory</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">UseCalendar</span> <span class="kd">extends</span> <span class="n">ThucydidesJUnitStory</span> <span class="o">{}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then make changes in configuration of your pom.xml. You should define where to find your JUnitStory classes and how many forks to use. For example you want to run all your stories in parallel mode.</p>
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>         <span class="nt">&lt;plugin&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;artifactId&gt;</span>maven-failsafe-plugin<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;version&gt;</span>2.16<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;systemPropertyVariables&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;webdriver.driver&gt;</span>${webdriver.driver}<span class="nt">&lt;/webdriver.driver&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/systemPropertyVariables&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;includes&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;include&gt;</span>**/acceptancetest/*.java<span class="nt">&lt;/include&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/includes&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;forkMode&gt;</span>perthread<span class="nt">&lt;/forkMode&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;threadCount&gt;</span>4<span class="nt">&lt;/threadCount&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;executions&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;goal&gt;</span>integration-test<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;goal&gt;</span>verify<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/executions&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/plugin&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now if you run your tests using maven then every story will run in one of four forks.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>mvn integration-test
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But it is boring to create new boilerplate class for each story file. That&rsquo;s why I created <em>maven-thucydides-jbehave-plugin</em> <a href="https://github.com/mdolinin/maven-thucydides-jbehave-plugin">src</a> for this job. To use it add to your pom.xml build section with goal <em>generate-sources</em> and define <em>project.junit.stories.package</em>(where to put generated stubs) in properties section. See example below:</p>
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;properties&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;project.build.sourceEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.build.sourceEncoding&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;project.reporting.outputEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.reporting.outputEncoding&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;webdriver.driver&gt;</span>firefox<span class="nt">&lt;/webdriver.driver&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;project.junit.stories.package&gt;</span>com.mdolinin.acceptancetest<span class="nt">&lt;/project.junit.stories.package&gt;</span>
+</span><span class='line'><span class="nt">&lt;/properties&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<figure class='code'><figcaption><span>pom.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>         <span class="nt">&lt;plugin&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;groupId&gt;</span>net.thucydides.maven.plugin<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;artifactId&gt;</span>maven-thucydides-jbehave-plugin<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;version&gt;</span>0.9.223-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;executions&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;execution&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;goals&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;goal&gt;</span>generate-sources<span class="nt">&lt;/goal&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/goals&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/execution&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/executions&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/plugin&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I hope this will be usefull for someone.</p>
+]]></content>
+  </entry>
+  
+</feed>

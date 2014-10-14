@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>
+            http://mdolinin.github.io/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel/
+        </loc>
+        <lastmod>2014-01-20T13:27:37+02:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://mdolinin.github.io/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order/
+        </loc>
+        <lastmod>2014-01-20T09:46:39+02:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://mdolinin.github.io/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/
+        </loc>
+        <lastmod>2014-07-07T17:45:36+03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://mdolinin.github.io/blog/archives/</loc>
+        <lastmod>2014-07-07T17:45:36+03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://mdolinin.github.io/</loc>
+        <lastmod>2014-07-07T17:45:36+03:00</lastmod>
+    </url>
+    <url>
+        <loc>http://mdolinin.github.io/robots.txt</loc>
+        <lastmod>2014-01-15T00:20:31+02:00</lastmod>
+    </url>
+</urlset>
