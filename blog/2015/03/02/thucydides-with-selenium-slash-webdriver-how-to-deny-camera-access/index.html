@@ -5,11 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: Maven - Automatization</title>
+  <title>Thucydides With Selenium/Webdriver: How to Deny Camera Access? - Automatization</title>
   <meta name="author" content="Mike Dolinin">
 
   
-  <meta name="description" content="Category: Maven">
+  <meta name="description" content="If you have web application that needs access to media devices, such as web camera,
+and try to use Selenium/Webdriver for test automation, you will &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +19,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://mdolinin.github.ioblog/categories/maven">
+  <link rel="canonical" href="http://mdolinin.github.io/blog/2015/03/02/thucydides-with-selenium-slash-webdriver-how-to-deny-camera-access">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Automatization" type="application/atom+xml">
@@ -76,64 +77,114 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: Maven</h1>
+    
+      <h1 class="entry-title">Thucydides With Selenium/Webdriver: How to Deny Camera Access?</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-02T23:13:36+02:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2015</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://mdolinin.github.io">Comments</a>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>If you have web application that needs access to media devices, such as web camera,
+and try to use Selenium/Webdriver for test automation, you will find that browser shows you own promt.
+In this promt the user is asked to allow or deny access to camera.</p>
 
-  
-  <h2>2014</h2>
+<p>To solve this issue you need to add extra parameter when start browser.
+Here is an example for Firefox and Chrome browsers for Thucydides framework,
+but you can use those options directly with Webdriver.</p>
 
-<article>
-  
-<h1><a href="/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/">Thucydides+JBehave+Maven Generate New Steps From Scenarios</a></h1>
-<time datetime="2014-07-07T10:30:39+03:00" pubdate><span class='month'>Jul</span> <span class='day'>07</span> <span class='year'>2014</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/jbehave/'>Jbehave</a>, <a class='category' href='/blog/categories/maven/'>Maven</a>, <a class='category' href='/blog/categories/thucydides/'>Thucydides</a></span>
-</footer>
-
-
-</article>
+<figure class='code'><figcaption><span>thucydides.properties</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">firefox.preferences</span><span class="o">=</span><span class="s">media.navigator.permission.disabled=true</span>
+</span><span class='line'><span class="na">chrome.switches</span><span class="o">=</span><span class="s">--use-fake-device-for-media-stream,--use-fake-ui-for-media-stream</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
-
-<article>
-  
-<h1><a href="/blog/2014/01/19/thucydides-plus-jbehave-plus-maven-run-tests-in-fixed-order/">Thucydides+JBehave+Maven Run Tests in Fixed Order</a></h1>
-<time datetime="2014-01-19T13:59:07+02:00" pubdate><span class='month'>Jan</span> <span class='day'>19</span> <span class='year'>2014</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/jbehave/'>Jbehave,</a>, <a class='category' href='/blog/categories/maven/'>Maven</a>, <a class='category' href='/blog/categories/thucydides/'>Thucydides,</a></span>
-</footer>
-
-
-</article>
-
-
-
-<article>
-  
-<h1><a href="/blog/2014/01/17/thucydides-plus-jbehave-plus-maven-run-tests-in-parallel/">Thucydides+JBehave+Maven Run Tests in Parallel</a></h1>
-<time datetime="2014-01-17T05:31:04+02:00" pubdate><span class='month'>Jan</span> <span class='day'>17</span> <span class='year'>2014</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/jbehave/'>Jbehave,</a>, <a class='category' href='/blog/categories/maven/'>Maven</a>, <a class='category' href='/blog/categories/thucydides/'>Thucydides,</a></span>
-</footer>
-
-
-</article>
-
+<p>
+I hope this will be usefull for someone.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Mike Dolinin</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-02T23:13:36+02:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2015</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/selenium/'>Selenium</a>, <a class='category' href='/blog/categories/thucydides/'>Thucydides</a>, <a class='category' href='/blog/categories/webdriver/'>Webdriver</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://mdolinin.github.io/blog/2015/03/02/thucydides-with-selenium-slash-webdriver-how-to-deny-camera-access/" data-via="dmo_builder" data-counturl="http://mdolinin.github.io/blog/2015/03/02/thucydides-with-selenium-slash-webdriver-how-to-deny-camera-access/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/" title="Previous Post: Thucydides+JBehave+Maven Generate new Steps from Scenarios">&laquo; Thucydides+JBehave+Maven Generate new Steps from Scenarios</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -213,7 +264,10 @@
       var disqus_shortname = 'mdoliningithubio';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mdolinin.github.io/blog/2015/03/02/thucydides-with-selenium-slash-webdriver-how-to-deny-camera-access/';
+        var disqus_url = 'http://mdolinin.github.io/blog/2015/03/02/thucydides-with-selenium-slash-webdriver-how-to-deny-camera-access/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

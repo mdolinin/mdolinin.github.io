@@ -9,8 +9,8 @@
   <meta name="author" content="Mike Dolinin">
 
   
-  <meta name="description" content="If you are using Jbehave framework, you know that it has very simple structure of .story file content.
-Which consists of steps &ndash; Given,When, &hellip;">
+  <meta name="description" content="If you have web application that needs access to media devices, such as web camera,
+and try to use Selenium/Webdriver for test automation, you will &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,61 @@ Which consists of steps &ndash; Given,When, &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/03/02/thucydides-with-selenium-slash-webdriver-how-to-deny-camera-access/">Thucydides With Selenium/Webdriver: How to Deny Camera Access?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-03-02T23:13:36+02:00" pubdate data-updated="true">Mar 2<span>nd</span>, 2015</time>
+        
+           | <a href="/blog/2015/03/02/thucydides-with-selenium-slash-webdriver-how-to-deny-camera-access/#disqus_thread"
+             data-disqus-identifier="http://mdolinin.github.io/blog/2015/03/02/thucydides-with-selenium-slash-webdriver-how-to-deny-camera-access/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you have web application that needs access to media devices, such as web camera,
+and try to use Selenium/Webdriver for test automation, you will find that browser shows you own promt.
+In this promt the user is asked to allow or deny access to camera.</p>
+
+<p>To solve this issue you need to add extra parameter when start browser.
+Here is an example for Firefox and Chrome browsers for Thucydides framework,
+but you can use those options directly with Webdriver.</p>
+
+<figure class='code'><figcaption><span>thucydides.properties</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='properties'><span class='line'><span class="na">firefox.preferences</span><span class="o">=</span><span class="s">media.navigator.permission.disabled=true</span>
+</span><span class='line'><span class="na">chrome.switches</span><span class="o">=</span><span class="s">--use-fake-device-for-media-stream,--use-fake-ui-for-media-stream</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+I hope this will be usefull for someone.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -280,6 +335,10 @@ But exists severall solutions for this issue.</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/02/thucydides-with-selenium-slash-webdriver-how-to-deny-camera-access/">Thucydides With Selenium/Webdriver: How to Deny Camera Access?</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2014/07/07/thucydides-plus-jbehave-plus-maven-generate-new-steps-from-scenarios/">Thucydides+JBehave+Maven Generate New Steps From Scenarios</a>
